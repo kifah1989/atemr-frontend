@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>roles</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid
+    class="ion-margin"
+    *ngFor="let role of roles$; index as i">
+    <ion-row (click)="toggleRoles(i)">
+      <ion-col>{{role.name}}</ion-col>
+      <ion-col>{{role.description}}</ion-col>
+      <ion-col>{{role.users.length}}</ion-col>
+      <ion-col>
+        <ion-button (click)="deleteRole(role.id)">delete</ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-list *ngFor="let users of role.users">
+      <ion-item *ngIf="roleIndex === i">{{users.userName}}<ion-button (click)="unassignUserToRole(users.id, role.id)">delete</ion-button>
+      </ion-item>
+
+    </ion-list>
+    <ion-item *ngIf="roleIndex === i">
+      <ion-label >Users</ion-label>
+
+      <ion-select
+        interface="popover"
+        [(ngModel)]="userId"
+        (ngModelChange)="assignUserToRole(userId, role.id )"
+      >
+
+        <ion-select-option
+          *ngFor="let user of addUsers; index as x"
+          [value]="user.id"
+        >
+          {{user.username}}
+
+
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-grid>
+  <ion-item>
+<ion-input
+  placeholder="name" #roleName
+></ion-input>
+<ion-input
+  placeholder="description"
+  #roleDescription
+></ion-input>
+<ion-button (click)="addRole(roleName.value, roleDescription.value)">add role</ion-button>
+</ion-item>
+</ion-content>

@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>users</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid class="ion-margin">
+
+    <ion-row>
+      <ion-col>Username</ion-col>
+      <ion-col>FirstName</ion-col>
+      <ion-col>LastName</ion-col>
+      <ion-col>RolesCount</ion-col>
+      <ion-col>Roles</ion-col>
+    </ion-row>
+
+    <ion-row *ngFor="let user of users$; index as i">
+      <ion-col>{{user.username}}</ion-col>
+      <ion-col>{{user.firstName}}</ion-col>
+      <ion-col>{{user.lastName}}</ion-col>
+      <ion-col>{{user.roles.length}}</ion-col>
+      <ion-col ><ion-text *ngFor="let role of user.roles; let isLast=last">{{role.roleName}}{{isLast ? '' : ', '}}</ion-text></ion-col>
+
+    </ion-row>
+
+  </ion-grid>
+</ion-content>
