@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
 import { Component, OnInit } from '@angular/core';
 import { ToastController } from '@ionic/angular';
+import { forkJoin, Observable } from 'rxjs';
 import { Role } from '../services/role.model';
 import { User } from '../services/user.model';
 import { UserService } from '../services/user.service';
@@ -15,70 +16,64 @@ import { UserService } from '../services/user.service';
   styleUrls: ['./roles.page.scss'],
 })
 export class RolesPage implements OnInit {
-  roles$: any;
-  users$: any;
+  roles$: Role[];
+  users$: User[];
   userId: string;
   roleIndex = -1;
   userIndex = -1;
-  addUsers: any;
   constructor(private userService: UserService, public toastController: ToastController) { }
 
   ngOnInit() {
-    this.getRoles();
-    this.getUsers();
+    this.getData();
   }
 
-  async getRoles(): Promise<void> {
-    this.userService.getRoles().subscribe(
-      async (value: Role[]) => {
-        this.roles$ = value;
+  getData() {
+    forkJoin(
+      {
+        roles: this.userService.getRoles(),
+        users: this.userService.getUser(),
+      }
+    )
+      .subscribe(async value => {
+
+        this.roles$ = await value.roles;
+        this.users$ = await value.users;
+
+        console.log('roles ', this.roles$)
+
+        console.log('users ', this.users$)
       });
   }
-
-  async getUsers(): Promise<void> {
-    this.userService.getUser().subscribe(
-      async (value: User[]) => {
-        this.users$ = value;
-      });
-  }
-
 
   async addRole(role, roleDescription): Promise<void> {
     this.userService.addRole(role, roleDescription)
-    .subscribe(async data => {
-      this.roles$ = data;
+      .subscribe(async data => {
+        this.roles$ = data;
 
-    },
-      async respose => {
-  const toast =  this.toastController.create({
-    message: respose.error.text,
-    duration: 2000
-  });
-  (await toast).present();
-},
-    async () => {
-      this.getRoles();
-      this.getUsers();
-
-    });
+      },
+        async respose => {
+          const toast = this.toastController.create({
+            message: respose.error.text,
+            duration: 2000
+          });
+          (await toast).present();
+        },
+        async () => {
+          this.getData();
+        });
   }
 
   async deleteRole(roleId): Promise<void> {
     this.userService.deleteRole(roleId).subscribe(data => {
       this.roles$ = data;
     },
-    async respose => {
-      const toast = this.toastController.create({
-        message: respose.error.text,
-        duration: 2000
-      });
-      (await toast).present();
-      this.getRoles();
-      this.getUsers();
-    },
-      async () => {
-        this.getRoles();
-        this.getUsers();
+      async respose => {
+        const toast = this.toastController.create({
+          message: respose.error.text,
+          duration: 2000
+        });
+        (await toast).present();
+        this.getData();
       });
   }
 
@@ -91,13 +86,8 @@ export class RolesPage implements OnInit {
         duration: 2000
       });
       (await toast).present();
-      this.getRoles();
-      this.getUsers();
-    },
-      async () => {
-        this.getRoles();
-        this.getUsers();
-      });
+      this.getData();
+    });
   }
 
   async unassignUserToRole(userId, roleId): Promise<void> {
@@ -109,13 +99,8 @@ export class RolesPage implements OnInit {
         duration: 2000
       });
       (await toast).present();
-      this.getRoles();
-      this.getUsers();
-    },
-      async () => {
-        this.getRoles();
-        this.getUsers();
-      });
+      this.getData();
+    });
   }
 
   toggleRoles(index) {
@@ -134,5 +119,4 @@ export class RolesPage implements OnInit {
       this.userIndex = index;
     }
   }
-
 }

@@ -31,7 +31,7 @@
       >
 
         <ion-select-option
-          *ngFor="let user of addUsers; index as x"
+          *ngFor="let user of users$; index as x"
           [value]="user.id"
         >
           {{user.username}}
