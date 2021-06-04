@@ -1,3 +1,4 @@
 # atemr-frontend
-npm i
-npm install
+# Getting Started
+1.	npm i
+2.	npm start
