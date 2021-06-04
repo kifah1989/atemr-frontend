@@ -1,0 +1,20 @@
+{
+    "RolesPage":{
+    "rolesPageTitle": "roles",
+    "deleteRoleButton": "Delete Role",
+    "addRoleButton": "Add Role",
+    "deleteUserFromRole": "Delete User",
+    "addUserToRoleButton": "Add Users",
+    "roleNameInput": "name",
+    "roleDescriptionInput": "description"
+    },
+    "UsersPage":{
+        "Title": "Users",
+        "UserName": "username",
+        "FirstName": "firstName",
+        "LastName": "lastName",
+        "RolesCount": "RolesCount",
+        "Roles": "roles"
+
+    }
+}

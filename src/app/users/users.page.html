@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>users</ion-title>
+    <ion-title>{{'UsersPage.Title'| translate}}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -8,11 +8,11 @@
   <ion-grid class="ion-margin">
 
     <ion-row>
-      <ion-col>Username</ion-col>
-      <ion-col>FirstName</ion-col>
-      <ion-col>LastName</ion-col>
-      <ion-col>RolesCount</ion-col>
-      <ion-col>Roles</ion-col>
+      <ion-col>{{'UsersPage.UserName'| translate}}</ion-col>
+      <ion-col>{{'UsersPage.FirstName'| translate}}</ion-col>
+      <ion-col>{{'UsersPage.LastName'| translate}}</ion-col>
+      <ion-col>{{'UsersPage.RolesCount'| translate}}</ion-col>
+      <ion-col>{{'UsersPage.Roles'| translate}}</ion-col>
     </ion-row>
 
     <ion-row *ngFor="let user of users$; index as i">

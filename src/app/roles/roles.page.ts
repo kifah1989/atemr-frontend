@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
 import { Component, OnInit } from '@angular/core';
 import { ToastController } from '@ionic/angular';
+import { TranslateService } from '@ngx-translate/core';
 import { forkJoin, Observable } from 'rxjs';
 import { Role } from '../services/role.model';
 import { User } from '../services/user.model';
@@ -21,10 +22,37 @@ export class RolesPage implements OnInit {
   userId: string;
   roleIndex = -1;
   userIndex = -1;
-  constructor(private userService: UserService, public toastController: ToastController) { }
+  missingUsersInRole: any;
+
+  constructor(private userService: UserService, public toastController: ToastController, public translate: TranslateService) {
+    translate.setDefaultLang('en');
+
+   }
 
   ngOnInit() {
     this.getData();
+  }
+
+  usersNotInRole(roleId){
+    var role;
+    var usersInRole;
+
+    for (var i = 0; i < this.roles$.length; i++) {
+      if (this.roles$[i].id === roleId) {
+        console.log(this.roles$[i]);
+        role = this.roles$[i];
+        usersInRole = role.users;
+        console.log('users in role', usersInRole)
+      }
+    }
+    var onlyInA = this.users$.filter(this.comparer(usersInRole));
+    var onlyInB = usersInRole.filter(this.comparer(this.users$));
+    var result = onlyInA.concat(onlyInB);
+    this.missingUsersInRole = result;
+  }
+
+  comparer(otherArray: any): any {
+    return (current) => otherArray.filter(other => other.id == current.id && other.userName == current.username).length == 0
   }
 
   getData() {
@@ -57,14 +85,12 @@ export class RolesPage implements OnInit {
             duration: 2000
           });
           (await toast).present();
-        },
-        async () => {
           this.getData();
         });
   }
 
   async deleteRole(roleId): Promise<void> {
-    this.userService.deleteRole(roleId).subscribe(data => {
+    this.userService.deleteRole(roleId).subscribe(async data => {
       this.roles$ = data;
     },
       async respose => {

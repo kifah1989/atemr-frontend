@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from 'src/app/services/user.service';
 import { User } from 'src/app/services/user.model';
+import { TranslateService } from '@ngx-translate/core';
 
 
 @Component({
@@ -12,7 +13,9 @@ export class UsersPage implements OnInit {
   users$: any;
 
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, public translate: TranslateService) {
+    translate.setDefaultLang('en');
+}
 
   ngOnInit() {
     this.userService.getUser().subscribe(
