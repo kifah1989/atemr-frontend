@@ -7,7 +7,7 @@
 <ion-content>
   <ion-grid
     class="ion-margin"
-    *ngFor="let role of roles$; index as i"(click)="usersNotInRole(role.id)">
+    *ngFor="let role of roles$; index as i">
     <ion-row (click)="toggleRoles(i)">
       <ion-col>{{role.name}}</ion-col>
       <ion-col>{{role.description}}</ion-col>
@@ -27,6 +27,7 @@
       <ion-select placeholder="{{'RolesPage.addUserToRoleButton'|translate}}"
         interface="popover"
         [(ngModel)]="userId" (ngModelChange)="assignUserToRole(userId, role.id )"
+        (click)="usersNotInRole(role.id)"
       >
 
         <ion-select-option 

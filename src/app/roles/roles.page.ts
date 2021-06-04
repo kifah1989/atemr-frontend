@@ -49,6 +49,7 @@ export class RolesPage implements OnInit {
     var onlyInB = usersInRole.filter(this.comparer(this.users$));
     var result = onlyInA.concat(onlyInB);
     this.missingUsersInRole = result;
+    this.userId = null;
   }
 
   comparer(otherArray: any): any {
