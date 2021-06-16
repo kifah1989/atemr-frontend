@@ -1,16 +1,11 @@
-/* eslint-disable guard-for-in */
-/* eslint-disable no-var */
-/* eslint-disable @typescript-eslint/semi */
-/* eslint-disable eqeqeq */
-/* eslint-disable curly */
-/* eslint-disable @typescript-eslint/prefer-for-of */
-import { Component, OnInit } from '@angular/core';
-import { ToastController } from '@ionic/angular';
-import { TranslateService } from '@ngx-translate/core';
-import { forkJoin, Observable } from 'rxjs';
-import { Role } from '../services/role.model';
-import { User } from '../services/user.model';
-import { UserService } from '../services/user.service';
+import {Component, OnInit} from '@angular/core';
+import {ToastController} from '@ionic/angular';
+import {TranslateService} from '@ngx-translate/core';
+import {forkJoin} from 'rxjs';
+import {Role} from '../services/role.model';
+import {User} from '../services/user.model';
+import {UserService} from '../services/user.service';
+
 @Component({
   selector: 'app-roles',
   templateUrl: './roles.page.html',
@@ -23,6 +18,7 @@ export class RolesPage implements OnInit {
   roleIndex = -1;
   userIndex = -1;
   missingUsersInRole: any;
+  responseMessage: any;
 
   constructor(private userService: UserService, public toastController: ToastController, public translate: TranslateService) {
     translate.setDefaultLang('en');
@@ -34,26 +30,23 @@ export class RolesPage implements OnInit {
   }
 
   usersNotInRole(roleId){
-    var role;
-    var usersInRole;
+    let role;
+    let usersInRole;
 
-    for (var i = 0; i < this.roles$.length; i++) {
-      if (this.roles$[i].id === roleId) {
-        console.log(this.roles$[i]);
-        role = this.roles$[i];
+    this.roles$.forEach(item => {
+      if (item.id === roleId) {
+        role = item;
         usersInRole = role.users;
-        console.log('users in role', usersInRole)
       }
-    }
-    var onlyInA = this.users$.filter(this.comparer(usersInRole));
-    var onlyInB = usersInRole.filter(this.comparer(this.users$));
-    var result = onlyInA.concat(onlyInB);
-    this.missingUsersInRole = result;
+    });
+    const onlyInA = this.users$.filter(this.comparer(usersInRole));
+    const onlyInB = usersInRole.filter(this.comparer(this.users$));
+    this.missingUsersInRole = onlyInA.concat(onlyInB);
     this.userId = null;
   }
 
   comparer(otherArray: any): any {
-    return (current) => otherArray.filter(other => other.id == current.id && other.userName == current.username).length == 0
+    return (current) => otherArray.filter(other => other.id === current.id && other.userName === current.username).length === 0;
   }
 
   getData() {
@@ -67,62 +60,50 @@ export class RolesPage implements OnInit {
 
         this.roles$ = await value.roles;
         this.users$ = await value.users;
-
-        console.log('roles ', this.roles$)
-
-        console.log('users ', this.users$)
       });
   }
 
-  async addRole(role, roleDescription): Promise<void> {
-    this.userService.addRole(role, roleDescription)
-      .subscribe(async data => {
-        this.roles$ = data;
-
-      },
-        async respose => {
-          const toast = this.toastController.create({
-            message: respose.error.text,
-            duration: 2000
-          });
-          (await toast).present();
-          this.getData();
-        });
-  }
-
-  async deleteRole(roleId): Promise<void> {
-    this.userService.deleteRole(roleId).subscribe(async data => {
-      this.roles$ = data;
-    },
-      async respose => {
-        const toast = this.toastController.create({
-          message: respose.error.text,
-          duration: 2000
-        });
-        (await toast).present();
-        this.getData();
-      });
-  }
-
-  async assignUserToRole(userId, roleId): Promise<void> {
-    this.userService.assignUserToRole(userId, roleId).subscribe(data => {
-      this.roles$ = data;
-    }, async respose => {
+  addRole(role, roleDescription) {
+    this.userService.addRole(role, roleDescription).subscribe(async res => {
       const toast = this.toastController.create({
-        message: respose.error.text,
+        message: res.toString(),
         duration: 2000
       });
       (await toast).present();
       this.getData();
-    });
+    },       error => console.log('error from component', error));
+
   }
 
-  async unassignUserToRole(userId, roleId): Promise<void> {
-    this.userService.unassignUserToRole(userId, roleId).subscribe(data => {
-      this.roles$ = data;
-    }, async respose => {
+   deleteRole(roleId) {
+    this.userService.deleteRole(roleId).subscribe(async res => {
       const toast = this.toastController.create({
-        message: respose.error.text,
+        message: res.toString(),
+        duration: 2000
+      });
+      (await toast).present();
+      this.getData();
+    },       error => console.log('error from component', error));
+
+   }
+
+   assignUserToRole(userId, roleId){
+     this.userService.assignUserToRole(userId, roleId).subscribe(async res => {
+       const toast = this.toastController.create({
+         message: res.toString(),
+         duration: 2000
+       });
+       (await toast).present();
+       this.getData();
+     },
+       error => console.log('error from component', error));
+  }
+
+  unassignUserToRole(userId, roleId) {
+    this.userService.unassignUserToRole(userId, roleId).subscribe(async res => {
+      this.responseMessage = res;
+      const toast = this.toastController.create({
+        message: this.responseMessage.response,
         duration: 2000
       });
       (await toast).present();
@@ -139,11 +120,4 @@ export class RolesPage implements OnInit {
     }
   }
 
-  toggleUsers(index) {
-    if (this.userIndex === index) {
-      this.userIndex = -1;
-    } else {
-      this.userIndex = index;
-    }
-  }
 }

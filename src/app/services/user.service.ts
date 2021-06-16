@@ -1,17 +1,18 @@
-
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { User } from './user.model';
-import { Role } from './role.model';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {Observable, of, throwError} from 'rxjs';
+import {environment} from 'src/environments/environment';
+import {User} from './user.model';
+import {Role} from './role.model';
+import {catchError, map} from 'rxjs/operators';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   getUser(): Observable<User[]> {
 
@@ -23,31 +24,65 @@ export class UserService {
     return this.http.get<Role[]>(`${environment.webApi}GetRoles`);
   }
 
-  assignUserToRole(userId, roleId): Observable<Role[]> {
+  assignUserToRole(userId, roleId) {
 
     const body = `{
       "userId": "${userId}",
       "roleId": "${roleId}"
     }`;
-    return this.http.put<Role[]>(`${environment.webApi}AssignUserToRole`, body);
+    const options = {responseType: 'text' as 'json'};
+    return this.http.put(`${environment.webApi}AssignUserToRole`, body, options).pipe(
+      map(res => res),
+      catchError(err => {
+        console.log('caught mapping error and rethrowing', err);
+        return throwError(err);
+      }),
+      catchError(err => {
+        console.log('caught rethrown error, providing fallback value', err);
+        return of([]);
+      })
+    );
   }
-  unassignUserToRole(userId, roleId): Observable<Role[]> {
 
-    const body = `{
-      "userId": "${userId}",
-      "roleId": "${roleId}"
-    }`;
-    return this.http.post<Role[]>(`${environment.webApi}UnassignUserToRole`, body);
+  //returning the response of a key value pair from the back end code
+  unassignUserToRole(uId, rId) {
+    const body = {
+      userId: uId,
+      roleId: rId
+    };
+    return this.http.post(`${environment.webApi}UnassignUserToRole`, body);
   }
-  addRole(name, description): Observable<Role[]> {
 
+  addRole(name, description) {
     const body = `{ "name": "${name}",
    "description": "${description}"}`;
-    return this.http.post<Role[]>(`${environment.webApi}AddRole`, body);
+    const options = {responseType: 'text' as 'json'};
+    return this.http.post(`${environment.webApi}AddRole`, body, options).pipe(
+      map(res => res),
+      catchError(err => {
+        console.log('caught mapping error and rethrowing', err);
+        return throwError(err);
+      }),
+      catchError(err => {
+        console.log('caught rethrown error, providing fallback value', err);
+        return of([]);
+      })
+    );
   }
-  deleteRole(roleId): Observable<Role[]> {
 
+  deleteRole(roleId) {
     const body = `{ "roleId": "${roleId}" }`;
-    return this.http.post<Role[]>(`${environment.webApi}DeleteRole`, body);
+    const options = {responseType: 'text' as 'json'};
+    return this.http.post<Role[]>(`${environment.webApi}DeleteRole`, body, options).pipe(
+      map(res => res),
+      catchError(err => {
+        console.log('caught mapping error and rethrowing', err);
+        return throwError(err);
+      }),
+      catchError(err => {
+        console.log('caught rethrown error, providing fallback value', err);
+        return of([]);
+      })
+    );
   }
 }
